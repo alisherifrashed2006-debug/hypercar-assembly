@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lykan Hypersport Assembly - Factory Reveal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            min-height: 900vh;
+        }
+
+        .stage {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.95), rgba(30, 40, 80, 0.95));
+            border-bottom: 1px solid rgba(100, 150, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(100, 150, 255, 0.1), 
+                transparent);
+            animation: scan-lines 3s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes scan-lines {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .stage-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(100, 150, 255, 0.8);
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #64b5ff, #ff6b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        .stage-description {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .stage-number {
+            font-size: 4rem;
+            font-weight: 700;
+            opacity: 0.1;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 3px;
+            background: rgba(100, 150, 255, 0.2);
+            margin: 30px auto;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #64b5ff, #ff6b9d);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(100, 150, 255, 0.8);
+            transition: width 0.3s ease;
+        }
+
+        .stage.active {
+            background: linear-gradient(135deg, rgba(30, 40, 80, 0.98), rgba(60, 80, 150, 0.98));
+        }
+
+        .stage.active::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(100, 150, 255, 0.1), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .stage:last-child {
+            background: linear-gradient(135deg, #0a0e27, #1a2563);
+            box-shadow: inset 0 0 100px rgba(100, 150, 255, 0.2);
+        }
+
+        .stage:last-child h1 {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #64b5ff, #ff6b9d, #64b5ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            animation: glow-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            text-align: center;
+            background: rgba(10, 14, 39, 0.95);
+            padding: 40px 60px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 150, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(100, 150, 255, 0.3);
+            border-top: 3px solid #64b5ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stage-label {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.9rem;
+            color: rgba(100, 150, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .info-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid rgba(100, 150, 255, 0.4);
+            padding: 15px 20px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            max-width: 250px;
+            backdrop-filter: blur(10px);
+            line-height: 1.6;
+        }
+
+        .info-panel strong {
+            color: #64b5ff;
+        }
+
+        .camera-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid rgba(100, 150, 255, 0.4);
+            padding: 15px 20px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .camera-controls p {
+            margin: 5px 0;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading Lykan Hypersport...</p>
+        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">Assembling your hypercar</p>
+    </div>
+
+    <div class="content">
+        <div class="stage" id="stage-0">
+            <div class="stage-label">01 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h1>LYKAN HYPERSPORT</h1>
+                <p class="stage-description">Factory Assembly Experience<br>Witness the precision engineering of luxury hypercar manufacturing</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 11%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage-1">
+            <div class="stage-label">02 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h2>Carbon Fiber Monocoque Chassis</h2>
+                <p class="stage-description">The foundation of hypercar engineering. Precision-laid carbon fiber composite structure, hand-crafted for optimal weight-to-strength ratio. Every layer strategically positioned for maximum rigidity and safety.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 22%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage-2">
+            <div class="stage-label">03 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h2>Engine Block & Powertrain</h2>
+                <p class="stage-description">Quad-turbo engine delivering extraordinary horsepower. Precision fuel injection, advanced cooling systems, and titanium components engineered for peak performance and reliability.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 33%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage-3">
+            <div class="stage-label">04 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h2>Suspension & Wheels</h2>
+                <p class="stage-description">Adaptive air suspension with real-time damping adjustment. High-performance forged wheels fitted with hypercar-grade performance tires engineered for extreme speeds and precision handling.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 44%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage-4">
+            <div class="stage-label">05 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h2>Interior Cabin</h2>
+                <p class="stage-description">Luxurious cockpit with hand-stitched leather, carbon fiber trim, and integrated infotainment systems. Ergonomically designed driver-centric layout with integrated race-car functionality and supreme comfort.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 55%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage-5">
+            <div class="stage-label">06 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h2>Body Panels</h2>
+                <p class="stage-description">Hand-laid carbon fiber aerodynamic panels. Every curve meticulously designed for optimal airflow, downforce, and visual drama. Active air management systems throughout.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 66%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage-6">
+            <div class="stage-label">07 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h2>Doors & Access Points</h2>
+                <p class="stage-description">Signature gullwing doors with precision hydraulic mechanisms. Frameless windows, integrated seamless transitions, and electronic locking systems for security and performance.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 77%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage-7">
+            <div class="stage-label">08 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h2>Lighting Systems</h2>
+                <p class="stage-description">LED matrix headlights with adaptive illumination. Custom LED taillights with dynamic signatures. Integrated ambient lighting systems throughout the exterior for stunning visual presence.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 88%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage" id="stage-8">
+            <div class="stage-label">09 / 09</div>
+            <div class="stage-content">
+                <div class="stage-number">━━━━━━━</div>
+                <h1>LYKAN HYPERSPORT COMPLETE</h1>
+                <p class="stage-description">Manufacturing perfection achieved. One of only a handful of extraordinary machines ever created. Precision. Power. Perfection.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <strong>Current Stage:</strong> <span id="current-stage">Initialization</span><br>
+        <strong>Scroll Progress:</strong> <span id="scroll-progress">0%</span>
+    </div>
+
+    <div class="camera-controls">
+        <p><strong>Camera Controls</strong></p>
+        <p>🖱️ Drag to rotate</p>
+        <p>🔍 Scroll to zoom</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@r128/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="assembly.js"></script>
+</body>
+</html>
